@@ -245,8 +245,8 @@
 
             drawnItems.addLayer(layer);
         });
-// GeoJSON Points
-var point = L.geoJson(null, {
+        // GeoJSON Points
+        var point = L.geoJson(null, {
             onEachFeature: function(feature, layer) {
 
                 var routedelete = "{{ route('points.destroy', ':id') }}";
@@ -259,10 +259,12 @@ var point = L.geoJson(null, {
                     "Nama: " + feature.properties.name + "<br>" +
                     "Deskripsi: " + feature.properties.description + "<br>" +
                     "Diubah: " + feature.properties.created_at + "<br>" +
-                    "<img src='{{ asset('storage/images') }}/" + feature.properties.image + "' width='200px' alt=''>" + "<br>" +
+                    "<img src='{{ asset('storage/images') }}/" + feature.properties.image +
+                    "' width='200px' alt=''>" + "<br>" +
                     "<div class='row mt-4'>" +
                     "<div class='col-6'>" +
-                    "<a href='" + routeedit + "' class='btn btn-warning btn-sm'><i class='fa-solid fa-pen-to-square'></i></a>" +
+                    "<a href='" + routeedit +
+                    "' class='btn btn-warning btn-sm'><i class='fa-solid fa-pen-to-square'></i></a>" +
                     "</div>" + "<div class='col-6 text-end'>" +
                     "<form method='POST' action='" + routedelete + "'>" +
                     '@csrf' + '@method('DELETE')' +
@@ -273,20 +275,20 @@ var point = L.geoJson(null, {
 
 
 
-            layer.on({
-                click: function(e) {
-                    point.bindPopup(popupContent);
-                },
-                mouseover: function(e) {
-                    point.bindTooltip(feature.properties.name);
-                },
-            });
-        },
-    });
-    $.getJSON("{{ route('api.points') }}", function(data) {
-        point.addData(data);
-        map.addLayer(point);
-    });
+                layer.on({
+                    click: function(e) {
+                        point.bindPopup(popupContent);
+                    },
+                    mouseover: function(e) {
+                        point.bindTooltip(feature.properties.name);
+                    },
+                });
+            },
+        });
+        $.getJSON("{{ route('api.points') }}", function(data) {
+            point.addData(data);
+            map.addLayer(point);
+        });
 
 
 
@@ -299,21 +301,30 @@ var point = L.geoJson(null, {
                 };
             },
             onEachFeature: function(feature, layer) {
-                var popupContent = "Name: " + feature.properties.name + "<br>" +
-                    "Deskripsi: " + feature.properties.description + "<br> " +
-                    "Panjang: " + feature.properties.length_km.toFixed(2) + "km<br> " +
-                    "Dibuat: " + feature.properties.created_at + "<br>" +
+
+                var routeedit = "{{ route('polylines.edit', ':id') }}";
+                routeedit = routeedit.replace(':id', feature.properties.id);
+
+                var routedelete = "{{ route('polylines.destroy', ':id') }}";
+                routedelete = routedelete.replace(':id', feature.properties.id);
+
+                               var popupContent =
+                    "Nama: " + feature.properties.name + "<br>" +
+                    "Deskripsi: " + feature.properties.description + "<br>" +
+                    "Diubah: " + feature.properties.created_at + "<br>" +
                     "<img src='{{ asset('storage/images') }}/" + feature.properties.image +
-                    "' width='200' alt=' '>" + "<br>" +
+                    "' width='200px' alt=''>" + "<br>" +
                     "<div class='row mt-4'>" +
                     "<div class='col-6'>" +
-                    "<a href='' class='btn btn-warning btn-sm'><i class='fa-solid fa-pen-to-square'></i></a>" +
+                    "<a href='" + routeedit +
+                    "' class='btn btn-warning btn-sm'><i class='fa-solid fa-pen-to-square'></i></a>" +
+                    "</div>" + "<div class='col-6 text-end'>" +
+                    "<form method='POST' action='" + routedelete + "'>" +
+                    '@csrf' + '@method('DELETE')' +
+                    "<button type='submit' class='btn btn-danger' onclick='return confirm(`Yakin akan dihapus?`)'><i class='fa-solid fa-trash-can'></i></button>" +
+                    "</form>" +
                     "</div>" +
-                    "<div class='col-6'>" +
-                    "<form method='POST' action='{{ url('polylines') }}/" + feature.properties.id + "'>" +
-                    '{{ csrf_field() }}' + '@method('DELETE')' +
-                    "<button type='submit' class= 'btn btn-sm btn-danger' onclick='return confirm(`Yakin akan dihapus?`)'><i class='fa-solid fa-trash'></i></button>" +
-                    "</form>";
+                    "</div>";
                 layer.on({
                     click: function(e) {
                         polylines.bindPopup(popupContent);
@@ -330,54 +341,58 @@ var point = L.geoJson(null, {
         });
 
         /* GeoJSON Polygon */
-        var polygons = L.geoJson(null, {
+        var polygon = L.geoJson(null, {
+            /* Style polygon */
             style: function(feature) {
                 return {
-                    color: '#1530b3',
-                    fillColor: '#bad5e0',
-                    fillOpacity: 0.8,
-                    weight: 2
+                    color: "#3388ff",
+                    fillColor: "#3388ff",
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.2,
                 };
             },
             onEachFeature: function(feature, layer) {
-                var popupContent = "Nama: " + feature.properties.name + "<br>" +
-                    "Deskripsi: " + feature.properties.description + "<br> " +
-                    "Luas(Km2): " + feature.properties.luas_km2.toFixed(2) + "km<sup>2</sup><br> " +
-                    "Dibuat: " + feature.properties.created_at + "<br>" +
+
+                var routeedit = "{{ route('polygons.edit', ':id') }}";
+                routeedit = routeedit.replace(':id', feature.properties.id);
+
+                var routedelete = "{{ route('polygons.destroy', ':id') }}";
+                routedelete = routedelete.replace(':id', feature.properties.id);
+
+                var popupContent =
+                    "Nama: " + feature.properties.name + "<br>" +
+                    "Deskripsi: " + feature.properties.description + "<br>" +
+                    "Diubah: " + feature.properties.created_at + "<br>" +
                     "<img src='{{ asset('storage/images') }}/" + feature.properties.image +
-                    "' width='200' alt=' '>" + "<br>" +
+                    "' width='200px' alt=''>" + "<br>" +
                     "<div class='row mt-4'>" +
                     "<div class='col-6'>" +
-                    "<a href='' class='btn btn-warning btn-sm'><i class='fa-solid fa-pen-to-square'></i></a>" +
+                    "<a href='" + routeedit +
+                    "' class='btn btn-warning btn-sm'><i class='fa-solid fa-pen-to-square'></i></a>" +
+                    "</div>" + "<div class='col-6 text-end'>" +
+                    "<form method='POST' action='" + routedelete + "'>" +
+                    '@csrf' + '@method('DELETE')' +
+                    "<button type='submit' class='btn btn-danger' onclick='return confirm(`Yakin akan dihapus?`)'><i class='fa-solid fa-trash-can'></i></button>" +
+                    "</form>" +
                     "</div>" +
-                    "<div class='col-6'>" +
-                    "<form method='POST' action='{{ url('polygons') }}/" + feature.properties.id + "'>" +
-                    '{{ csrf_field() }}' + '@method('DELETE')' +
-                    "<button type='submit' class= 'btn btn-sm btn-danger' onclick='return confirm(`Yakin akan dihapus?`)'><i class='fa-solid fa-trash'></i></button>" +
-                    "</form>";
+                    "</div>";
+
                 layer.on({
                     click: function(e) {
-                        polygons.bindPopup(popupContent);
+                        polygon.bindPopup(popupContent);
                     },
                     mouseover: function(e) {
-                        polygons.bindTooltip(feature.properties.kab_kota);
+                        polygon.bindTooltip(feature.properties.name, {
+                            sticky: true,
+                        });
                     },
                 });
             },
         });
         $.getJSON("{{ route('api.polygons') }}", function(data) {
-            polygons.addData(data);
-            map.addLayer(polygons);
+            polygon.addData(data);
+            map.addLayer(polygon);
         });
-
-        // Control Layer
-        var overlayMaps = {
-            "Points": points,
-            "Polylines": polylines,
-            "Polygons": polygons,
-        };
-
-        var controllayer = L.control.layers(overlayMaps);
-        controllayer.addTo(map);
     </script>
 @endsection

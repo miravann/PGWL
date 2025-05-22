@@ -11,36 +11,78 @@ class PolygonsModel extends Model
 
     protected $guarded = ['id'];
 
-    public function geojson_polygons()
-    {
-        $polygons = $this->select(DB::raw('id, st_asgeojson(geom) as geom, name, description, image,
-        st_area(geom, true) as luas_m2, st_area(geom, true)/1000000 as luas_km2,
-        st_area(geom, true)/10000 as luas_hektar, created_at, updated_at'))
+    public function geojson_polygons(){
+
+        $polygons = $this
+       ->select(DB::raw('id, ST_AsGeoJson(geom) AS geom, ST_Area(geom, true) AS area_m2, ST_Area(geom, true)/1000000 AS area_km2, ST_Area(geom, true)/10000 AS area_hectare, name, description, created_at, updated_at, image'))
+
         ->get();
 
-
         $geojson = [
-            'type'=> 'FeatureCollection',
-            'features' => [],
+            'type'      => 'FeatureCollection',
+            'features'  => []
         ];
-        foreach ($polygons as $p) {
+
+        foreach ($polygons as $polygon) {
             $feature = [
                 'type' => 'Feature',
-                'geometry' => json_decode($p->geom),
+                'geometry' => json_decode($polygon->geom),
                 'properties' => [
-                    'id' => $p->id,
-                    'name' => $p->name,
-                    'description' => $p->description,
-                    'luas_m2' => $p->luas_m2,
-                    'luas_km2' => $p->luas_km2,
-                    'luas_hektar' => $p->luas_hektar,
-                    'created_at' => $p->created_at,
-                    'updated_at' => $p->updated_at,
-                    'image' => $p->image,
-                ],
+                    'id' => $polygon->id,
+                    'name' => $polygon->name,
+                    'description' => $polygon->description,
+                    'area_m2' => $polygon->area_m2,
+                    'area_km2' => $polygon->area_km2,
+                    'area_hectare' => $polygon->area_hectare,
+                    'created_at' => $polygon->created_at,
+                    'updated_at' => $polygon->updated_at,
+                    'image' => $polygon->image
+
+                ]
             ];
+
             array_push($geojson['features'], $feature);
         }
+
         return $geojson;
+
+    }
+
+    public function geojson_polygon($id){
+
+        $polygons = $this
+       ->select(DB::raw('id, ST_AsGeoJson(geom) AS geom, ST_Area(geom, true) AS area_m2, ST_Area(geom, true)/1000000 AS area_km2, ST_Area(geom, true)/10000 AS area_hectare, name, description, created_at, updated_at, image'))
+
+        ->where('id', $id)
+        ->get();
+
+        $geojson = [
+            'type'      => 'FeatureCollection',
+            'features'  => []
+        ];
+
+        foreach ($polygons as $polygon) {
+            $feature = [
+                'type' => 'Feature',
+                'geometry' => json_decode($polygon->geom),
+                'properties' => [
+                    'id' => $polygon->id,
+                    'name' => $polygon->name,
+                    'description' => $polygon->description,
+                    'area_m2' => $polygon->area_m2,
+                    'area_km2' => $polygon->area_km2,
+                    'area_hectare' => $polygon->area_hectare,
+                    'created_at' => $polygon->created_at,
+                    'updated_at' => $polygon->updated_at,
+                    'image' => $polygon->image
+
+                ]
+            ];
+
+            array_push($geojson['features'], $feature);
+        }
+
+        return $geojson;
+
     }
 }
